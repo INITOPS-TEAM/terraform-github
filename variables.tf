@@ -3,7 +3,7 @@ variable "repo_names" {
     object(
       {
         name=string,
-        micro_repo=boolean,
+        micro_repo=bool,
         }
     )
   )
