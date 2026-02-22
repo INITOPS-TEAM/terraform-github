@@ -10,7 +10,7 @@ resource "github_repository" "template" {
 resource "github_repository" "initops_team" {
   for_each = var.repo_names
 
-  name                   = each.value.micro_repo ? "buried-marks-${each.value.name}" : "${each.value.name}"
+  name                   = each.value.micro_repo ? "buried-marks-${each.value.name}" : each.value.name
   description            = "Repositry managed by Terraform"
   visibility             = "public"
   delete_branch_on_merge = true
