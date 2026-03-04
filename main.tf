@@ -48,3 +48,17 @@ resource "github_branch_protection" "initops_team" {
     pull_request_bypassers          = [data.github_user.self.node_id]
   }
 }
+
+resource "github_actions_secret" "aws_access_key_id" {
+  for_each = var.repo_names
+  repository       = github_repository.initops_team[each.key].name
+  secret_name      = "aws_access_key_id"
+  plaintext_value  = var.aws_access_key_id
+}
+
+resource "github_actions_secret" "aws_secret_key" {
+  for_each = var.repo_names
+  repository       = github_repository.initops_team[each.key].name
+  secret_name      = "aws_access_key_id"
+  plaintext_value  = var.aws_secret_key
+}
