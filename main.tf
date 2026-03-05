@@ -32,6 +32,18 @@ resource "github_repository_file" "pr_template" {
   overwrite_on_create = true
 }
 
+resource "github_repository_file" "docker_ecr" {
+  for_each = var.repo_names
+
+  repository          = github_repository.initops_team[each.key].name
+  file                = ".github/workflows/docker_ecr.yml"
+  content             = length(each.value.services) > 0 ? templatefile(".github/workflows/docker_ecr.tfpl", {
+    services_yml = yamlencode(each.value.services)
+  }) : file(".github/workflows/docker_front_ecr.yml")
+  commit_message      = "Managed by Terraform"
+  overwrite_on_create = true
+}
+
 resource "github_branch_protection" "initops_team" {
   for_each = var.repo_names
 
@@ -49,16 +61,29 @@ resource "github_branch_protection" "initops_team" {
   }
 }
 
-resource "github_actions_secret" "aws_access_key_id" {
-  for_each = var.repo_names
-  repository       = github_repository.initops_team[each.key].name
+data "github_repositories" "buried-marks-repositories" {
+  query = "org:INITOPS-TEAM buried-marks"
+  include_repo_id = true
+}
+
+resource "github_actions_organization_secret" "aws_access_key_id" {
   secret_name      = "aws_access_key_id"
+  visibility      = "selected"
   plaintext_value  = var.aws_access_key_id
 }
 
-resource "github_actions_secret" "aws_secret_key" {
-  for_each = var.repo_names
-  repository       = github_repository.initops_team[each.key].name
+resource "github_actions_organization_secret" "aws_secret_key" {
   secret_name      = "aws_secret_key"
+  visibility      = "selected"
   plaintext_value  = var.aws_secret_key
+}
+
+resource "github_actions_organization_secret_repositories" "aws_secret_key" {
+  secret_name             = github_actions_organization_secret.aws_secret_key.secret_name
+  selected_repository_ids = data.github_repositories.buried-marks-repositories.repo_ids
+}
+
+resource "github_actions_organization_secret_repositories" "aws_access_key_id" {
+  secret_name             = github_actions_organization_secret.aws_access_key_id.secret_name
+  selected_repository_ids = data.github_repositories.buried-marks-repositories.repo_ids
 }

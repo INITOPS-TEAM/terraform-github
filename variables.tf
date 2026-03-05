@@ -2,19 +2,24 @@ variable "repo_names" {
   type = map(
     object(
       {
-        name       = string,
-        micro_repo = bool,
+        name       = string
+        micro_repo = bool
+        services   = list(object({
+          name     = string
+          ecr_repo = string
+          content  = string
+        }))
       }
     )
   )
 }
 
 variable "aws_access_key_id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "aws_secret_key" {
-  type = string
+  type      = string
   sensitive = true
 }
