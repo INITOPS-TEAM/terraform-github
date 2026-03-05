@@ -39,7 +39,7 @@ resource "github_repository_file" "docker_ecr" {
   file                = ".github/workflows/docker_ecr.yml"
   content             = length(each.value.services) > 0 ? templatefile(".github/workflows/docker_ecr.tfpl", {
     services_yml = yamlencode(each.value.services)
-  }) : file(".github/workflows/docker_front_ecr.yml")
+  }) : file(".github/workflows/docker_ecr.yml")
   commit_message      = "Managed by Terraform"
   overwrite_on_create = true
 }
