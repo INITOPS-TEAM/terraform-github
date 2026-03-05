@@ -7,7 +7,7 @@ variable "repo_names" {
         services   = list(object({
           name     = string
           ecr_repo = string
-          content  = string
+          context  = string
         }))
       }
     )
