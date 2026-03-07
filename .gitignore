@@ -8,3 +8,8 @@
 # Crash log files
 crash.log
 crash.*.log
+
+*.tfvars
+
+docker_ecr_v1.tfpl
+
