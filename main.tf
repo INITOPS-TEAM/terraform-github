@@ -55,7 +55,7 @@ resource "github_branch_protection" "initops_team" {
   required_pull_request_reviews {
     dismiss_stale_reviews           = true
     require_last_push_approval      = true
-    required_approving_review_count = 1
+    required_approving_review_count = 2
     # RUN SECOND TIME WITH COMMENTED LOWER LINE TO DELETE BYPASS PERMISSIONS FOR A USER PERSONALLY
     pull_request_bypassers = [data.github_user.self.node_id]
   }
