@@ -33,8 +33,10 @@ resource "github_repository_file" "pr_template" {
 }
 
 resource "github_repository_file" "docker_ecr" {
-  for_each = var.repo_names
-
+  for_each = {
+    for k, v in var.repo_names : k => v
+    if !strcontains(k, "infrastructure") && !strcontains(k, "terraform")
+  }
   repository = github_repository.initops_team[each.key].name
   file       = ".github/workflows/docker_ecr.yml"
   content = length(each.value.services) > 0 ? templatefile(".github/workflows/docker_ecr.tfpl", {
