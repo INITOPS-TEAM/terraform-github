@@ -1,3 +1,17 @@
+locals {
+  no_infra_repo = {
+    for k, v in var.repo_names : k => v
+      if !strcontains(k, "infrastructure") && !strcontains(k, "terraform")
+    }
+
+  docker_ecr_file_contents = {
+    for file, repo in local.no_infra_repo : file =>
+      length(repo.services) > 0
+        ? templatefile(".github/workflows/docker_ecr.tfpl", { services = repo.services })
+        : file(".github/workflows/docker_ecr.yml")
+  }
+}
+
 resource "github_repository" "template" {
 
   name                   = "repo-template"
@@ -33,15 +47,10 @@ resource "github_repository_file" "pr_template" {
 }
 
 resource "github_repository_file" "docker_ecr" {
-  for_each = {
-    for k, v in var.repo_names : k => v
-    if !strcontains(k, "infrastructure") && !strcontains(k, "terraform")
-  }
-  repository = github_repository.initops_team[each.key].name
-  file       = ".github/workflows/docker_ecr.yml"
-  content = length(each.value.services) > 0 ? templatefile(".github/workflows/docker_ecr.tfpl", {
-    services = each.value.services
-  }) : file(".github/workflows/docker_ecr.yml")
+  for_each            = local.no_infra_repo
+  repository          = github_repository.initops_team[each.key].name
+  file                = ".github/workflows/docker_ecr.yml"
+  content             = local.docker_ecr_file_contents[each.key]
   commit_message      = "Managed by Terraform"
   overwrite_on_create = true
 }
