@@ -1,7 +1,7 @@
 locals {
   no_infra_repo = {
     for k, v in var.repo_names : k => v
-      if !strcontains(k, "infrastructure") && !strcontains(k, "terraform")
+      if !strcontains(k, "infrastructure") && !strcontains(k, "terraform") && !strcontains(k, "jenkins")
     }
 
   docker_ecr_file_contents = {
