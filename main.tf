@@ -26,8 +26,8 @@ resource "github_repository_file" "pr_template" {
   for_each = var.repo_names
 
   repository          = github_repository.initops_team[each.key].name
-  file                = "assets/pull_request_template.md"
-  content             = file(".github/pull_request_template.md")
+  file                = ".github/pull_request_template.md"
+  content             = file("assets/pull_request_template.md")
   commit_message      = "Managed by Terraform"
   overwrite_on_create = true
 }
@@ -35,7 +35,7 @@ resource "github_repository_file" "pr_template" {
 resource "github_repository_file" "docker_ecr" {
   for_each            = local.no_infra_repo
   repository          = github_repository.initops_team[each.key].name
-  file                = "assets/docker_ecr.yml"
+  file                = ".github/workflows/docker_ecr.yml"
   content             = local.docker_ecr_file_contents[each.key]
   commit_message      = "Managed by Terraform"
   overwrite_on_create = true
