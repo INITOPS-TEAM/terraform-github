@@ -1,17 +1,3 @@
-locals {
-  no_infra_repo = {
-    for k, v in var.repo_names : k => v
-      if !strcontains(k, "infrastructure") && !strcontains(k, "terraform")
-    }
-
-  docker_ecr_file_contents = {
-    for file, repo in local.no_infra_repo : file =>
-      length(repo.services) > 0
-        ? templatefile(".github/workflows/docker_ecr.tfpl", { services = repo.services })
-        : file(".github/workflows/docker_ecr.yml")
-  }
-}
-
 resource "github_repository" "template" {
 
   name                   = "repo-template"
@@ -41,7 +27,7 @@ resource "github_repository_file" "pr_template" {
 
   repository          = github_repository.initops_team[each.key].name
   file                = ".github/pull_request_template.md"
-  content             = file(".github/pull_request_template.md")
+  content             = file("assets/pull_request_template.md")
   commit_message      = "Managed by Terraform"
   overwrite_on_create = true
 }
@@ -70,31 +56,4 @@ resource "github_branch_protection" "initops_team" {
     # RUN SECOND TIME WITH COMMENTED LOWER LINE TO DELETE BYPASS PERMISSIONS FOR A USER PERSONALLY
     pull_request_bypassers = [data.github_user.self.node_id]
   }
-}
-
-data "github_repositories" "buried-marks-repositories" {
-  query           = "org:INITOPS-TEAM buried-marks"
-  include_repo_id = true
-}
-
-resource "github_actions_organization_secret" "aws_access_key_id" {
-  secret_name     = "aws_access_key_id"
-  visibility      = "selected"
-  plaintext_value = var.aws_access_key_id
-}
-
-resource "github_actions_organization_secret" "aws_secret_key" {
-  secret_name     = "aws_secret_key"
-  visibility      = "selected"
-  plaintext_value = var.aws_secret_key
-}
-
-resource "github_actions_organization_secret_repositories" "aws_secret_key" {
-  secret_name             = github_actions_organization_secret.aws_secret_key.secret_name
-  selected_repository_ids = data.github_repositories.buried-marks-repositories.repo_ids
-}
-
-resource "github_actions_organization_secret_repositories" "aws_access_key_id" {
-  secret_name             = github_actions_organization_secret.aws_access_key_id.secret_name
-  selected_repository_ids = data.github_repositories.buried-marks-repositories.repo_ids
 }
