@@ -14,3 +14,22 @@ variable "repo_names" {
     )
   )
 }
+
+variable "helm_services" {
+  type = map(
+    object(
+      {
+        name       = string
+        chart_name = string
+      }
+    )
+  )
+}
+
+variable "aws_envs" {
+  type = list(string)
+}
+
+variable "aws_region" {
+  type = string
+}

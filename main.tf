@@ -41,6 +41,14 @@ resource "github_repository_file" "docker_ecr" {
   overwrite_on_create = true
 }
 
+resource "github_repository_file" "helm_ecr" {
+  repository          = github_repository.initops_team["helm_infrastructure"].name
+  file                = ".github/workflows/helm_ecr.yml"
+  content             = templatefile("assets/helm_ecr.tfpl", { helm_services : var.helm_services, aws_envs : var.aws_envs })
+  commit_message      = "Managed by Terraform"
+  overwrite_on_create = true
+}
+
 resource "github_branch_protection" "initops_team" {
   for_each = var.repo_names
 
@@ -52,7 +60,7 @@ resource "github_branch_protection" "initops_team" {
   required_pull_request_reviews {
     dismiss_stale_reviews           = true
     require_last_push_approval      = true
-    required_approving_review_count = 2
+    required_approving_review_count = 1
     # RUN SECOND TIME WITH COMMENTED LOWER LINE TO DELETE BYPASS PERMISSIONS FOR A USER PERSONALLY
     pull_request_bypassers = [data.github_user.self.node_id]
   }
