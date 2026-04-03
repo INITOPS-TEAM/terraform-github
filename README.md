@@ -5,6 +5,7 @@
 - Repositories creation
 - Branch protection
 - `.github/pull_request_template.md` initialisation
+- GitHub Action workflow files from `assets/` population
 
 ## Authentication
 
